@@ -12,7 +12,7 @@ struct RepoHunterApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ContentView(httpClient: HTTPClient())
+                ContentView(viewModel: RepositoryListViewModel(httpClient: HTTPClient()))
             }
         }
     }

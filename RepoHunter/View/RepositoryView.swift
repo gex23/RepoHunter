@@ -12,15 +12,26 @@ struct RepositoryView: View {
     let repository: Repository
     
     var body: some View {
-        HStack {
-            AsyncImage(url: repository.owner.avatarUrl) { image in
-                image.resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 75, height: 75)
-            } placeholder: {
-                ProgressView()
+        VStack {
+            HStack {
+                AsyncImage(url: repository.owner.avatarUrl) { image in
+                    image.resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 75, height: 75)
+                } placeholder: {
+                    ProgressView()
+                }
+                
+                Text("\(repository.owner.login)/\(repository.name)").font(.headline)
             }
-            Text(repository.fullName)
+            
+            VStack {
+                Text("Description: ").font(.caption)
+                
+                Divider()
+                
+                Text(repository.description ?? "-")
+            }
         }
     }
 }

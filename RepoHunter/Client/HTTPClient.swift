@@ -10,6 +10,7 @@ import Combine
 
 enum NetworkError: Error {
     case badUrl
+    case unknownError
 }
 
 class HTTPClient {
