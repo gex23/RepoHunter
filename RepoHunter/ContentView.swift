@@ -18,18 +18,17 @@ struct ContentView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            
-            HStack {
-                
+        VStack() {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
                 TextField(
                     "Search GitHub Reposipories",
                     text: $viewModel.text
                 )
-                .padding(8)
-                .background(RoundedRectangle(cornerRadius: 8)
+                .frame(height: 45)
+                .padding(.leading)
+                .background(RoundedRectangle(cornerRadius: 12)
                     .stroke(Color.gray, lineWidth: 1))
-                .padding()
+                .padding(.leading, 10)
                 
                 Button(
                     action: {
@@ -38,35 +37,41 @@ struct ContentView: View {
                     label: {
                         Text("Search").font(.headline)
                     }
-                ).padding()
+                )
+                .padding(.trailing, 20)
             }
             
-            Spacer()
-            
-            switch viewModel.state {
-            case .idle:
-                Text("Idle")
-            case .loading :
-                Text("Loading...")
-            case .loaded(let repositories):
-                List(repositories) { repository in
-                    NavigationLink(destination:
-                                    WebView(url: repository.htmlUrl)
-                        .navigationBarTitle(
-                            Text(repository.owner.login).font(.title)
-                        )
-                    ) {
-                        RepositoryView(repository: repository)
+            HStack {
+                switch viewModel.state {
+                case .idle:
+                    Text("Idle")
+                case .loading :
+                    Text("Loading...")
+                case .loaded(let repositories):
+                    List(repositories) { repository in
+                        NavigationLink(destination:
+                                        RepositoryDetailsView(repository: repository)
+                            .navigationBarTitle(
+                                Text("Repository Details")
+                            )
+                        ) {
+                            RepositoryView(repository: repository)
+                        }
                     }
+                    .listStyle(.plain)
+                case .error(_) :
+                    Text("An error occure")
                 }
-                
-            case .error(_) :
-                Text("An error occure")
             }
         }
         .navigationBarTitle(
             Text("Search 🔍")
         )
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.leading, 5)
+        .padding(.trailing, 5)
+        .padding(.top, 5)
+        .padding(.bottom, 5)
     }
     
 }
