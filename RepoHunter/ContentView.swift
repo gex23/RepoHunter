@@ -32,7 +32,7 @@ struct ContentView: View {
                 
                 Button(
                     action: {
-                        viewModel.fetchRepositories(search: viewModel.text)
+                        viewModel.fetchRepositories()
                     },
                     label: {
                         Text("Search").font(.headline)
@@ -44,9 +44,16 @@ struct ContentView: View {
             HStack {
                 switch viewModel.state {
                 case .idle:
-                    Text("Idle")
+                    VStack(alignment:.center, spacing: 2) {
+                        Text("Find your stuff")
+                            .font(.headline)
+                        Text("Search all of GitHub for Repositories")
+                    }
+                    .padding(.top)
                 case .loading :
                     Text("Loading...")
+                        .font(.headline)
+                        .padding(.top)
                 case .loaded(let repositories):
                     List(repositories) { repository in
                         NavigationLink(destination:
@@ -57,10 +64,14 @@ struct ContentView: View {
                         ) {
                             RepositoryView(repository: repository)
                         }
+                    } .refreshable {
+                        viewModel.fetchRepositories()
                     }
                     .listStyle(.plain)
-                case .error(_) :
-                    Text("An error occure")
+                case .error(let error) :
+                    Text(error.message)
+                        .font(.headline)
+                        .padding(.top)
                 }
             }
         }
