@@ -7,6 +7,16 @@
 
 import Foundation
 
+enum Sort: String {
+    case stars
+    case updated
+}
+
+enum Order: String {
+    case desc
+    case asc
+}
+
 struct RequestParameters {
     let query: String
     let sort: Sort
@@ -25,14 +35,4 @@ struct RequestParameters {
             "page": page
         ]
     }
-}
-
-enum Sort: String {
-    case stars
-    case updated
-}
-
-enum Order: String {
-    case desc
-    case asc
 }

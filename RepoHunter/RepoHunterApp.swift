@@ -12,7 +12,7 @@ struct RepoHunterApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                SearchContentView(viewModel: RepositoryListViewModel(httpClient: GitHubApi()))
+                ContentView(viewModel: RepositoryListViewModel(httpClient: GitHubApi()))
             }
         }
     }

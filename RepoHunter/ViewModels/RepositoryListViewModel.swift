@@ -11,7 +11,7 @@ import Combine
 enum FetchingState {
     case idle
     case loading
-    case loaded([Repository])
+    case loaded([RepositoryItem])
     case error(ApiError)
 }
 
@@ -24,7 +24,7 @@ class RepositoryListViewModel: ObservableObject {
     private var pageOffset = 1
     
                 
-    @Published private(set) var repositories: [Repository] = []
+    @Published private(set) var repositories: [RepositoryItem] = []
     @Published var state: FetchingState = .idle
     
     @Published var lastViewedId: Int?
@@ -69,16 +69,16 @@ class RepositoryListViewModel: ObservableObject {
             }, receiveValue: { [weak self] searchResponse in
                 self?.maxDataCount = searchResponse.totalCount
                 if loadMore {
-                    self?.repositories.append(contentsOf: searchResponse.items)
+                    self?.repositories.append(contentsOf: RepositoryRaw.mapRepositoryRawToPlain(raw: searchResponse.items))
                 } else {
-                    self?.repositories = searchResponse.items
+                    self?.repositories = RepositoryRaw.mapRepositoryRawToPlain(raw: searchResponse.items)
                 }
                 self?.state = .loaded(self?.repositories ?? [])
             })
             .store(in: &cancellables)
     }
     
-    func shouldLoadMore(current item: Repository) {
+    func shouldLoadMore(current item: RepositoryItem) {
         if let lastItem = repositories.last, lastItem == item,
            repositories.count < maxDataCount {
             loadMore()

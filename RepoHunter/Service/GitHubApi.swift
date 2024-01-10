@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-enum ApiError: Error {
+enum ApiError: Error, Equatable {
     case badUrl
     case failedStatusError
     case decodingError
