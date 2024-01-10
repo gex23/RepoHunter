@@ -28,12 +28,16 @@ enum ApiError: Error {
     }
 }
 
-struct HTTPClient {
+struct GitHubApi {
     
-    func searchRepositories(search: String) -> AnyPublisher<[Repository], ApiError> {
-        guard let encodedSearch = search.urlEncoded,
-              let url = URL(string: "https://api.github.com/search/repositories?q=\(encodedSearch)")
-        else {
+    func searchRepositories(requestParameters: RequestParameters) -> AnyPublisher<SearchResponse, ApiError> {
+        
+        var components = URLComponents(string: "https://api.github.com/search/repositories")
+        components?.queryItems = requestParameters.dictionary().map {
+            URLQueryItem(name: $0.key, value: "\($0.value)")
+        }        
+        
+        guard let url = components?.url else {
             return Fail(error: ApiError.badUrl).eraseToAnyPublisher()
         }
         
@@ -60,7 +64,6 @@ struct HTTPClient {
                     return ApiError.customError("The network request has failed.")
                 }
             }
-            .map(\.items)
             .eraseToAnyPublisher()
     }
 }

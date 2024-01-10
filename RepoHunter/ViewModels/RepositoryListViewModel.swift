@@ -17,22 +17,47 @@ enum FetchingState {
 
 class RepositoryListViewModel: ObservableObject {
     
-    private let httpClient: HTTPClient
+    private let httpClient: GitHubApi
     private var cancellables: Set<AnyCancellable> = []
-    var text: String = ""
     
+    private var maxDataCount = 0
+    private var pageOffset = 1
+    
+                
     @Published private(set) var repositories: [Repository] = []
     @Published var state: FetchingState = .idle
     
+    @Published var lastViewedId: Int?
     
-    init(httpClient: HTTPClient) {
+    @Published var searchText: String = ""
+    @Published var order: Order = .desc
+    @Published var sort: Sort = .stars
+    
+    init(httpClient: GitHubApi) {
         self.httpClient = httpClient
+    }
+            
+    func search() {
+        if searchText.isEmpty {
+            return
+        }
         
+        self.state = .loading
+        self.pageOffset = 1
+    
+        fetch(loadMore: false)
     }
     
-    func fetchRepositories() {
-        self.state = .loading
-        httpClient.searchRepositories(search: text)
+    private func fetch(loadMore: Bool) {
+        let params =  RequestParameters(
+            query: searchText,
+            sort: self.sort,
+            order: self.order,
+            perPage: 30,
+            page: pageOffset
+        )
+        
+        httpClient.searchRepositories(requestParameters: params)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
@@ -41,9 +66,27 @@ class RepositoryListViewModel: ObservableObject {
                 case .failure(let error):
                     self?.state = .error(error)
                 }
-            }, receiveValue: { [weak self] repositories in
-                self?.state = .loaded(repositories)
+            }, receiveValue: { [weak self] searchResponse in
+                self?.maxDataCount = searchResponse.totalCount
+                if loadMore {
+                    self?.repositories.append(contentsOf: searchResponse.items)
+                } else {
+                    self?.repositories = searchResponse.items
+                }
+                self?.state = .loaded(self?.repositories ?? [])
             })
             .store(in: &cancellables)
+    }
+    
+    func shouldLoadMore(current item: Repository) {
+        if let lastItem = repositories.last, lastItem == item,
+           repositories.count < maxDataCount {
+            loadMore()
+        }
+    }
+    
+    func loadMore() {
+        pageOffset += 1
+        fetch(loadMore: true)
     }
 }

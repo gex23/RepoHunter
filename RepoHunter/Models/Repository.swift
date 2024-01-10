@@ -7,13 +7,18 @@
 
 import Foundation
 
+enum ListItem {
+    case repository(Repository)
+    case loading
+}
+
 struct SearchResponse: Decodable {
     let totalCount: Int
     let incompleteResults: Bool
     let items: [Repository]
 }
 
-struct Repository: Identifiable, Decodable {
+struct Repository: Identifiable, Decodable, Equatable {
     let id: Int
     let name: String
     let fullName: String

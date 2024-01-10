@@ -9,6 +9,8 @@ import SwiftUI
 
 struct RepositoryView: View {
     
+    @Binding var lastViewedId: Int?
+    
     let repository: Repository
     
     var body: some View {
@@ -18,6 +20,7 @@ struct RepositoryView: View {
             
             Text("\(repository.description ?? "-")")
                 .font(.caption)
+                .lineLimit(3)
             
             HStack(alignment: .bottom, spacing: 2) {
                 Text("\(repository.stargazersCount) stars")
@@ -30,6 +33,9 @@ struct RepositoryView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .onAppear{
+            lastViewedId = repository.id
+        }
     }
 }
 
