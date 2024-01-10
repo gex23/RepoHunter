@@ -54,21 +54,28 @@ struct RepositoryDetailsView: View {
             }
             
             HStack(alignment: .center, spacing: 10) {
-                Text("\(repository.stargazersCount) stars")
-                    .font(.title3)
-                Image(systemName: "star")
+                HStack(alignment: .center, spacing: 5) {
+                    Text("\(repository.stargazersCount)")
+                        .font(.caption)
+                    Image(systemName: "star")
+                    
+                    Text("\(repository.forksCount)")
+                        .font(.caption)
+                    Image(systemName: "arrow.triangle.branch")
+                    
+                }
                 
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("Created: \(repository.createdAt)")
-                        .font(.footnote)
+                        .font(.caption2)
                     
                     Text("Updated: \(repository.updatedAt)")
-                        .font(.footnote)
+                        .font(.caption2)
                 }
             }.padding(.trailing)
-
+            
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
