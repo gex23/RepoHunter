@@ -22,8 +22,7 @@ class RepositoryListViewModel: ObservableObject {
     
     private var maxDataCount = 0
     private var pageOffset = 1
-    
-                
+
     @Published private(set) var repositories: [RepositoryItem] = []
     @Published var state: FetchingState = .idle
     
@@ -33,6 +32,8 @@ class RepositoryListViewModel: ObservableObject {
     @Published var order: Order = .desc
     @Published var sort: Sort = .stars
     
+    @Published var isLoadingMore = false
+
     init(httpClient: GitHubApi) {
         self.httpClient = httpClient
     }
@@ -73,6 +74,7 @@ class RepositoryListViewModel: ObservableObject {
                 } else {
                     self?.repositories = RepositoryRaw.mapRepositoryRawToPlain(raw: searchResponse.items)
                 }
+                self?.isLoadingMore = false
                 self?.state = .loaded(self?.repositories ?? [])
             })
             .store(in: &cancellables)
@@ -86,6 +88,10 @@ class RepositoryListViewModel: ObservableObject {
     }
     
     func loadMore() {
+        guard !isLoadingMore else {
+            return
+        }
+        isLoadingMore = true
         pageOffset += 1
         fetch(loadMore: true)
     }

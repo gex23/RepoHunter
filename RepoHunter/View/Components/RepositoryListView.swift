@@ -26,17 +26,26 @@ struct RepositoryListView: View {
                 .padding(.top)
         case .loaded(let repositories):
             ScrollViewReader { scrollViewProxy in
-                List(repositories) { repository in
-                    NavigationLink(destination:
-                                    RepositoryDetailsView(repository: repository)
-                        .navigationBarTitle(
-                            Text("Repository Details")
-                        )
-                    ) {
-                        RepositoryView(lastViewedId: $viewModel.lastViewedId, repository: repository)
-                            .onAppear{
-                                viewModel.shouldLoadMore(current: repository)
-                            }
+                List {
+                    ForEach(repositories) { repository in
+                        NavigationLink(destination:
+                                        RepositoryDetailsView(repository: repository)
+                            .navigationBarTitle(
+                                Text("Repository Details")
+                            )
+                        ) {
+                            RepositoryView(lastViewedId: $viewModel.lastViewedId, repository: repository)
+                                .onAppear{
+                                    viewModel.shouldLoadMore(current: repository)
+                                }
+                        }
+                    }
+                    if viewModel.isLoadingMore {
+                        ProgressView {
+                            Text("Fetching next page...")
+                                .font(.footnote)
+                        }
+                        .frame(maxWidth: .infinity)
                     }
                 }
                 .onChange(of: viewModel.lastViewedId) { _ , newValue in
